@@ -96,6 +96,12 @@ function App() {
       return acc;
     }, {});
 
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
     for (const driver in groupsByDriver) {
       const doc = new jsPDF();
       let y = 15;
@@ -123,7 +129,7 @@ function App() {
         y = doc.lastAutoTable.finalY + 10;
       });
 
-      doc.save(`${driver}.pdf`);
+      doc.save(`${formattedDate}_${driver}.pdf`);
     }
   };
 
