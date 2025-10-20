@@ -104,14 +104,24 @@ function App() {
       let y = 20;
 
       groupsByDriver[driver].forEach((group) => {
+        const body = group.subTableRows.map((row) =>
+          group.subTableHeaderIndices.map((colIndex) => row[colIndex]),
+        );
+        if (group.notes) {
+          body.push([
+            {
+              content: `Note: ${group.notes}`,
+              colSpan: 4,
+              styles: { fontStyle: "italic" },
+            },
+          ]);
+        }
         autoTable(doc, {
           startY: y,
           head: [
             ["Assortimenti", "Nome del punto", "# ordini", "Scarico pallet"],
           ],
-          body: group.subTableRows.map((row) =>
-            group.subTableHeaderIndices.map((colIndex) => row[colIndex]),
-          ),
+          body: body,
           didDrawPage: function (data) {
             y = data.cursor.y;
           },
