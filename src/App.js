@@ -49,7 +49,6 @@ function App() {
               const desiredColumns = [
                 "Assortimenti",
                 "Nome del punto",
-                "# ordini",
                 "Scarico pallet",
               ];
               currentGroup.subTableHeaderIndices = desiredColumns.map((col) =>
