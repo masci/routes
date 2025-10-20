@@ -135,7 +135,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Spreadsheet Viewer</h1>
+        <h1>Gestione Gite</h1>
         <input type="file" onChange={handleFileUpload} />
         <button onClick={handleExportToPdf}>Export to PDF</button>
       </header>
