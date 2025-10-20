@@ -83,54 +83,59 @@ function App() {
         <h1>Spreadsheet Viewer</h1>
         <input type="file" onChange={handleFileUpload} />
       </header>
-      <div className="table-container">
-        {sheetData.groups.map((group, index) => (
-          <div key={index} className="group-container">
-            <h2>Gita: {group.id}</h2>
-            <div className="group-inputs">
-              <input
-                type="text"
-                placeholder="Driver Name"
-                value={group.driverName || ""}
-                onChange={(e) => handleInputChange(e, index, "driverName")}
-              />
-              <input
-                type="text"
-                placeholder="Notes"
-                value={group.notes || ""}
-                onChange={(e) => handleInputChange(e, index, "notes")}
-              />
-            </div>
-            {group.subTableHeader && (
-              <table className="table">
-                <thead>
-                  <tr>
-                    {[
-                      "Assortimenti",
-                      "Nome del punto",
-                      "# ordini",
-                      "Scarico pallet",
-                    ].map((h, i) => (
-                      <th key={i}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {group.subTableRows.map((row, i) => (
-                    <tr key={i}>
-                      {group.subTableHeaderIndices.map((colIndex, j) =>
-                        colIndex !== -1 ? (
-                          <td key={j}>{row[colIndex]}</td>
-                        ) : null,
-                      )}
+      <>
+        <div className="table-container">
+          {sheetData.groups.map((group, index) => (
+            <div key={index} className="group-container">
+              <h2>Group: {group.id}</h2>
+              <div className="group-inputs">
+                <input
+                  type="text"
+                  placeholder="Driver Name"
+                  value={group.driverName || ""}
+                  onChange={(e) => handleInputChange(e, index, "driverName")}
+                />
+                <input
+                  type="text"
+                  placeholder="Notes"
+                  value={group.notes || ""}
+                  onChange={(e) => handleInputChange(e, index, "notes")}
+                />
+              </div>
+              {group.subTableHeader && (
+                <table className="table">
+                  <thead>
+                    <tr>
+                      {[
+                        "Assortimenti",
+                        "Nome del punto",
+                        "# ordini",
+                        "Scarico pallet",
+                      ].map((h, i) => (
+                        <th key={i}>{h}</th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        ))}
-      </div>
+                  </thead>
+                  <tbody>
+                    {group.subTableRows.map((row, i) => (
+                      <tr key={i}>
+                        {group.subTableHeaderIndices.map((colIndex, j) =>
+                          colIndex !== -1 ? (
+                            <td key={j}>{row[colIndex]}</td>
+                          ) : null,
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="total-groups">
+          <h3>Total Groups: {sheetData.groups.length}</h3>
+        </div>
+      </>
     </div>
   );
 }
