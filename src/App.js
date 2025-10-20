@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import "./App.css";
 
 function App() {
@@ -77,11 +79,58 @@ function App() {
     });
   };
 
+  const handleExportToPdf = () => {
+    const hasMissingDriver = sheetData.groups.some((group) => !group.driverName);
+    if (hasMissingDriver) {
+      alert("Please assign a driver to all groups before exporting to PDF.");
+      return;
+    }
+
+    const groupsByDriver = sheetData.groups.reduce((acc, group) => {
+      const driver = group.driverName;
+      if (!acc[driver]) {
+        acc[driver] = [];
+      }
+      acc[driver].push(group);
+      return acc;
+    }, {});
+
+    for (const driver in groupsByDriver) {
+      const doc = new jsPDF();
+      doc.text(`Driver: ${driver}`, 14, 16);
+
+      let y = 20;
+
+      groupsByDriver[driver].forEach((group) => {
+        autoTable(doc, {
+          startY: y,
+          head: [
+            [
+              "Assortimenti",
+              "Nome del punto",
+              "# ordini",
+              "Scarico pallet",
+            ],
+          ],
+          body: group.subTableRows.map((row) =>
+            group.subTableHeaderIndices.map((colIndex) => row[colIndex]),
+          ),
+          didDrawPage: function (data) {
+            y = data.cursor.y;
+          },
+        });
+      });
+
+      doc.save(`${driver}.pdf`);
+    }
+  };
+
   return (
     <div className="App">
       <header className="App-header">
         <h1>Spreadsheet Viewer</h1>
         <input type="file" onChange={handleFileUpload} />
+        <button onClick={handleExportToPdf}>Export to PDF</button>
       </header>
       <>
         <div className="table-container">
