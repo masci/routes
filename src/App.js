@@ -99,11 +99,11 @@ function App() {
 
     for (const driver in groupsByDriver) {
       const doc = new jsPDF();
-      doc.text(`Driver: ${driver}`, 14, 16);
-
-      let y = 20;
+      let y = 15;
 
       groupsByDriver[driver].forEach((group) => {
+        doc.text(`Gita: ${group.id}`, 14, y);
+        y += 2;
         const body = group.subTableRows.map((row) =>
           group.subTableHeaderIndices.map((colIndex) => row[colIndex]),
         );
@@ -120,10 +120,8 @@ function App() {
           startY: y,
           head: [["Assortimenti", "Nome del punto", "Scarico pallet"]],
           body: body,
-          didDrawPage: function (data) {
-            y = data.cursor.y;
-          },
         });
+        y = doc.lastAutoTable.finalY + 10;
       });
 
       doc.save(`${driver}.pdf`);
