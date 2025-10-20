@@ -34,6 +34,8 @@ function App() {
               mainTableRows: [],
               subTableHeader: null,
               subTableRows: [],
+              driverName: "",
+              notes: "",
             };
             groupedData.push(currentGroup);
           }
@@ -63,6 +65,18 @@ function App() {
     reader.readAsBinaryString(file);
   };
 
+  const handleInputChange = (e, groupIndex, field) => {
+    const { value } = e.target;
+    setSheetData((prevData) => {
+      const updatedGroups = [...prevData.groups];
+      updatedGroups[groupIndex] = {
+        ...updatedGroups[groupIndex],
+        [field]: value,
+      };
+      return { ...prevData, groups: updatedGroups };
+    });
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -71,8 +85,22 @@ function App() {
       </header>
       <div className="table-container">
         {sheetData.groups.map((group, index) => (
-          <div key={index}>
-            <h2>Group: {group.id}</h2>
+          <div key={index} className="group-container">
+            <h2>Gita: {group.id}</h2>
+            <div className="group-inputs">
+              <input
+                type="text"
+                placeholder="Driver Name"
+                value={group.driverName || ""}
+                onChange={(e) => handleInputChange(e, index, "driverName")}
+              />
+              <input
+                type="text"
+                placeholder="Notes"
+                value={group.notes || ""}
+                onChange={(e) => handleInputChange(e, index, "notes")}
+              />
+            </div>
             {group.subTableHeader && (
               <table className="table">
                 <thead>
