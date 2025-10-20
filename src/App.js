@@ -118,9 +118,7 @@ function App() {
         }
         autoTable(doc, {
           startY: y,
-          head: [
-            ["Assortimenti", "Nome del punto", "# ordini", "Scarico pallet"],
-          ],
+          head: [["Assortimenti", "Nome del punto", "Scarico pallet"]],
           body: body,
           didDrawPage: function (data) {
             y = data.cursor.y;
@@ -167,14 +165,11 @@ function App() {
                 <table className="table">
                   <thead>
                     <tr>
-                      {[
-                        "Assortimenti",
-                        "Nome del punto",
-                        "# ordini",
-                        "Scarico pallet",
-                      ].map((h, i) => (
-                        <th key={i}>{h}</th>
-                      ))}
+                      {["Assortimenti", "Nome del punto", "Scarico pallet"].map(
+                        (h, i) => (
+                          <th key={i}>{h}</th>
+                        ),
+                      )}
                     </tr>
                   </thead>
                   <tbody>
