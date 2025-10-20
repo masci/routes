@@ -80,7 +80,9 @@ function App() {
   };
 
   const handleExportToPdf = () => {
-    const hasMissingDriver = sheetData.groups.some((group) => !group.driverName);
+    const hasMissingDriver = sheetData.groups.some(
+      (group) => !group.driverName,
+    );
     if (hasMissingDriver) {
       alert("Please assign a driver to all groups before exporting to PDF.");
       return;
@@ -105,12 +107,7 @@ function App() {
         autoTable(doc, {
           startY: y,
           head: [
-            [
-              "Assortimenti",
-              "Nome del punto",
-              "# ordini",
-              "Scarico pallet",
-            ],
+            ["Assortimenti", "Nome del punto", "# ordini", "Scarico pallet"],
           ],
           body: group.subTableRows.map((row) =>
             group.subTableHeaderIndices.map((colIndex) => row[colIndex]),
@@ -132,20 +129,25 @@ function App() {
         <input type="file" onChange={handleFileUpload} />
         <button onClick={handleExportToPdf}>Export to PDF</button>
       </header>
+      <div className="total-groups">
+        <h3>Totale gite: {sheetData.groups.length}</h3>
+      </div>
       <>
         <div className="table-container">
           {sheetData.groups.map((group, index) => (
             <div key={index} className="group-container">
-              <h2>Group: {group.id}</h2>
+              <h2>Gita: {group.id}</h2>
               <div className="group-inputs">
                 <input
                   type="text"
+                  name="driver-name"
                   placeholder="Driver Name"
                   value={group.driverName || ""}
                   onChange={(e) => handleInputChange(e, index, "driverName")}
                 />
                 <input
                   type="text"
+                  name="notes"
                   placeholder="Notes"
                   value={group.notes || ""}
                   onChange={(e) => handleInputChange(e, index, "notes")}
@@ -180,9 +182,6 @@ function App() {
               )}
             </div>
           ))}
-        </div>
-        <div className="total-groups">
-          <h3>Total Groups: {sheetData.groups.length}</h3>
         </div>
       </>
     </div>
