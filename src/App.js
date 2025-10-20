@@ -112,7 +112,7 @@ function App() {
             {
               content: `Note: ${group.notes}`,
               colSpan: 4,
-              styles: { fontStyle: "italic" },
+              styles: { fontStyle: "italic", halign: "center" },
             },
           ]);
         }
