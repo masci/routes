@@ -98,8 +98,8 @@ function App() {
 
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
 
     for (const driver in groupsByDriver) {
@@ -107,7 +107,7 @@ function App() {
       let y = 15;
 
       groupsByDriver[driver].forEach((group) => {
-        doc.text(`Gita: ${group.id}`, 14, y);
+        doc.text(`Gita: ${group.id}  Autista: ${driver}`, 14, y);
         y += 2;
         const body = group.subTableRows.map((row) =>
           group.subTableHeaderIndices.map((colIndex) => row[colIndex]),
