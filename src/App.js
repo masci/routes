@@ -6,6 +6,10 @@ import "./App.css";
 
 function App() {
   const [sheetData, setSheetData] = useState({ idIndex: null, groups: [] });
+  // Spreadsheet configuration
+  const idIndex = 6;
+  const columnIndices = [18, 23, 26];
+  const columnHeaders = ["Destinazione", "Codice prodotto", "Quantità"];
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -16,49 +20,24 @@ function App() {
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       const jsonData = XLSX.utils.sheet_to_json(ws, { header: 1 });
-      const [header, ...rows] = jsonData;
-      const idIndex = header.indexOf("Id");
-
-      if (idIndex === -1) {
-        alert('Column "Id" not found!');
-        return;
-      }
+      const [, ...rows] = jsonData;
 
       let groupedData = [];
       let currentGroup = null;
 
       for (const row of rows) {
         const id = row[idIndex];
-        if (id) {
-          if (!currentGroup || currentGroup.id !== id) {
-            currentGroup = {
-              id: id,
-              mainTableRows: [],
-              subTableHeader: null,
-              subTableRows: [],
-              driverName: "",
-              notes: "",
-            };
-            groupedData.push(currentGroup);
-          }
-          currentGroup.mainTableRows.push(row);
-        } else {
-          if (currentGroup) {
-            if (!currentGroup.subTableHeader) {
-              currentGroup.subTableHeader = row;
-              const desiredColumns = [
-                "Assortimenti",
-                "Nome del punto",
-                "Scarico pallet",
-              ];
-              currentGroup.subTableHeaderIndices = desiredColumns.map((col) =>
-                row.indexOf(col),
-              );
-            } else {
-              currentGroup.subTableRows.push(row);
-            }
-          }
+        if (!currentGroup || currentGroup.id !== id) {
+          currentGroup = {
+            id: id,
+            rows: [],
+            driverName: "",
+            notes: "",
+          };
+          groupedData.push(currentGroup);
         }
+
+        currentGroup.rows.push(row);
       }
 
       setSheetData({ idIndex, groups: groupedData });
@@ -109,8 +88,8 @@ function App() {
       groupsByDriver[driver].forEach((group) => {
         doc.text(`Gita: ${group.id}  Autista: ${driver}`, 14, y);
         y += 2;
-        const body = group.subTableRows.map((row) =>
-          group.subTableHeaderIndices.map((colIndex) => row[colIndex]),
+        const body = group.rows.map((row) =>
+          columnIndices.map((colIndex) => row[colIndex]),
         );
         if (group.notes) {
           body.push([
@@ -123,7 +102,7 @@ function App() {
         }
         autoTable(doc, {
           startY: y,
-          head: [["Assortimenti", "Nome del punto", "Scarico pallet"]],
+          head: [columnHeaders],
           body: body,
         });
         y = doc.lastAutoTable.finalY + 10;
@@ -164,30 +143,26 @@ function App() {
                   onChange={(e) => handleInputChange(e, index, "notes")}
                 />
               </div>
-              {group.subTableHeader && (
-                <table className="table">
-                  <thead>
-                    <tr>
-                      {["Assortimenti", "Nome del punto", "Scarico pallet"].map(
-                        (h, i) => (
-                          <th key={i}>{h}</th>
-                        ),
+              <table className="table">
+                <thead>
+                  <tr>
+                    {columnHeaders.map((h, i) => (
+                      <th key={i}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {group.rows.map((row, i) => (
+                    <tr key={i}>
+                      {columnIndices.map((colIndex, j) =>
+                        colIndex !== -1 ? (
+                          <td key={j}>{row[colIndex]}</td>
+                        ) : null,
                       )}
                     </tr>
-                  </thead>
-                  <tbody>
-                    {group.subTableRows.map((row, i) => (
-                      <tr key={i}>
-                        {group.subTableHeaderIndices.map((colIndex, j) =>
-                          colIndex !== -1 ? (
-                            <td key={j}>{row[colIndex]}</td>
-                          ) : null,
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+                  ))}
+                </tbody>
+              </table>
             </div>
           ))}
         </div>
