@@ -27,6 +27,10 @@ function App() {
 
       for (const row of rows) {
         const id = row[idIndex];
+        if (!id) {
+          continue;
+        }
+
         if (!currentGroup || currentGroup.id !== id) {
           currentGroup = {
             id: id,
