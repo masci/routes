@@ -63,11 +63,16 @@ function App() {
   };
 
   const handleExportToPdf = async () => {
+    if (sheetData.groups.length === 0) {
+      alert("Nessuna gita presente. Importa un file Excel prima.");
+      return;
+    }
+
     const hasMissingDriver = sheetData.groups.some(
       (group) => !group.driverName,
     );
     if (hasMissingDriver) {
-      alert("Please assign a driver to all groups before exporting to PDF.");
+      alert("Assegna un autista a tutte le gite prima di esportare in PDF.");
       return;
     }
 
@@ -126,7 +131,11 @@ function App() {
     summaryY += 10;
 
     for (const group of sheetData.groups) {
-      summaryDoc.text(`Gita: ${group.id}  Autista: ${group.driverName || "Non Assegnato"}`, 14, summaryY);
+      summaryDoc.text(
+        `Gita: ${group.id}  Autista: ${group.driverName || "Non Assegnato"}`,
+        14,
+        summaryY,
+      );
       summaryY += 2;
       const body = group.rows.map((row) =>
         columnIndices.map((colIndex) => row[colIndex]),
