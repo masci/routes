@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import JSZip from "jszip";
 import "./App.css";
 
 function App() {
@@ -61,7 +62,7 @@ function App() {
     });
   };
 
-  const handleExportToPdf = () => {
+  const handleExportToPdf = async () => {
     const hasMissingDriver = sheetData.groups.some(
       (group) => !group.driverName,
     );
@@ -84,6 +85,8 @@ function App() {
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
+
+    const zip = new JSZip();
 
     for (const driver in groupsByDriver) {
       const doc = new jsPDF();
@@ -112,16 +115,25 @@ function App() {
         y = doc.lastAutoTable.finalY + 10;
       });
 
-      doc.save(`${formattedDate}_${driver}.pdf`);
+      const pdfBlob = doc.output("blob");
+      zip.file(`${formattedDate}_${driver}.pdf`, pdfBlob);
     }
+
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(zipBlob);
+    link.download = `${formattedDate}_gite.zip`;
+    link.click();
   };
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>Gestione Gite</h1>
-        <input type="file" onChange={handleFileUpload} />
-        <button onClick={handleExportToPdf}>Export to PDF</button>
+        <div className="controls">
+          <input type="file" onChange={handleFileUpload} />
+          <button onClick={handleExportToPdf}>Genera PDF</button>
+        </div>
       </header>
       <div className="total-groups">
         <h3>Totale gite: {sheetData.groups.length}</h3>
