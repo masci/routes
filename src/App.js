@@ -119,6 +119,38 @@ function App() {
       zip.file(`${formattedDate}_${driver}.pdf`, pdfBlob);
     }
 
+    // Generate a summary PDF with all entries
+    const summaryDoc = new jsPDF();
+    let summaryY = 15;
+    summaryDoc.text("Riepilogo Generale Gite", 14, summaryY);
+    summaryY += 10;
+
+    for (const group of sheetData.groups) {
+      summaryDoc.text(`Gita: ${group.id}  Autista: ${group.driverName || "Non Assegnato"}`, 14, summaryY);
+      summaryY += 2;
+      const body = group.rows.map((row) =>
+        columnIndices.map((colIndex) => row[colIndex]),
+      );
+      if (group.notes) {
+        body.push([
+          {
+            content: `Note: ${group.notes}`,
+            colSpan: 4,
+            styles: { fontStyle: "italic", halign: "center" },
+          },
+        ]);
+      }
+      autoTable(summaryDoc, {
+        startY: summaryY,
+        head: [columnHeaders],
+        body: body,
+      });
+      summaryY = summaryDoc.lastAutoTable.finalY + 10;
+    }
+
+    const summaryPdfBlob = summaryDoc.output("blob");
+    zip.file(`all_entries_${formattedDate}.pdf`, summaryPdfBlob);
+
     const zipBlob = await zip.generateAsync({ type: "blob" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(zipBlob);

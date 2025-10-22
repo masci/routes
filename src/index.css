@@ -10,8 +10,7 @@ body {
 
 .controls {
     align-items: center;
-    padding: 1rem;
-}
-.controls.button {
-    margin-left: 1rem;
+    button {
+        margin: 1rem;
+    }
 }
