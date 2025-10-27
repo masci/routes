@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import JSZip from "jszip";
+import html2canvas from "html2canvas";
 import "./App.css";
 
 function getFormattedDate(date) {
@@ -118,42 +119,58 @@ function App() {
     }, {});
 
     const zip = new JSZip();
+    const exportContainer = document.getElementById("export-container");
 
     for (const driver in groupsByDriver) {
-      const doc = new jsPDF();
-      let y = 15;
+      const driverGroups = groupsByDriver[driver];
+      const driverContainer = document.createElement("div");
+      driverContainer.className = "group-container";
 
-      groupsByDriver[driver].forEach((group) => {
-        doc.text(`Gita: ${group.id}  Autista: ${driver}`, 14, y);
-        y += 2;
-        const body = group.rows.map((row) =>
-          columnIndices.map((colIndex) => row[colIndex]),
-        );
-        // Add the total number of plt
-        body.push([
-          "",
-          "",
-          { content: group.totalPlt, styles: { fontStyle: "bold" } },
-        ]);
-        if (group.notes) {
-          body.push([
-            {
-              content: `Note: ${group.notes}`,
-              colSpan: 4,
-              styles: { fontStyle: "italic", halign: "center" },
-            },
-          ]);
-        }
-        autoTable(doc, {
-          startY: y,
-          head: [columnHeaders],
-          body: body,
-        });
-        y = doc.lastAutoTable.finalY + 10;
+      driverGroups.forEach((group) => {
+        const groupEl = document.createElement("div");
+        groupEl.innerHTML = `
+          <h2>Gita: ${group.id}  Autista: ${driver}</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                ${columnHeaders.map((h) => `<th>${h}</th>`).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${group.rows
+                .map(
+                  (row) => `
+                <tr>
+                  ${columnIndices
+                    .map((colIndex) => `<td>${row[colIndex] || ""}</td>`)
+                    .join("")}
+                </tr>
+              `,
+                )
+                .join("")}
+              <tr>
+                <td></td>
+                <td></td>
+                <td class="total">${group.totalPlt}</td>
+              </tr>
+              ${
+                group.notes
+                  ? `<tr><td colspan="3" class="notes">Note: ${group.notes}</td></tr>`
+                  : ""
+              }
+            </tbody>
+          </table>
+        `;
+        driverContainer.appendChild(groupEl);
       });
 
-      const pdfBlob = doc.output("blob");
-      zip.file(`${formattedDate}_${driver}.pdf`, pdfBlob);
+      exportContainer.appendChild(driverContainer);
+      const canvas = await html2canvas(driverContainer);
+      const jpegBlob = await new Promise((resolve) =>
+        canvas.toBlob(resolve, "image/jpeg"),
+      );
+      zip.file(`${formattedDate}_${driver}.jpeg`, jpegBlob);
+      exportContainer.removeChild(driverContainer);
     }
 
     // Generate a summary PDF with all entries
@@ -211,6 +228,10 @@ function App() {
 
   return (
     <div className="App">
+      <div
+        id="export-container"
+        style={{ position: "absolute", left: "-9999px" }}
+      ></div>
       <header className="App-header">
         <h1>Gestione Gite</h1>
         <div className="controls">
