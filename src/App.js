@@ -150,7 +150,11 @@ function App() {
     // Generate a summary PDF with all entries
     const summaryDoc = new jsPDF();
     let summaryY = 15;
-    summaryDoc.text("Riepilogo Generale Gite", 14, summaryY);
+    summaryDoc.text(
+      `Riepilogo gite del ${formatDate(selectedDate)}`,
+      14,
+      summaryY,
+    );
     summaryY += 10;
 
     for (const group of sheetData.groups) {
