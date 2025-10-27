@@ -14,3 +14,7 @@ body {
         margin: 1rem;
     }
 }
+
+td.total {
+    font-weight: bold;
+}

@@ -25,6 +25,7 @@ function formatDate(dateString) {
 function App() {
   // Spreadsheet configuration
   const idIndex = 6;
+  const totalPltIndex = 26;
   const columnIndices = [18, 23, 26];
   const columnHeaders = ["Destinazione", "Codice prodotto", "Quantità"];
 
@@ -67,10 +68,12 @@ function App() {
             rows: [],
             driverName: "",
             notes: "",
+            totalPlt: 0,
           };
           groupedData.push(currentGroup);
         }
 
+        currentGroup.totalPlt += parseInt(row[totalPltIndex]) || 0;
         currentGroup.rows.push(row);
       }
 
@@ -126,6 +129,12 @@ function App() {
         const body = group.rows.map((row) =>
           columnIndices.map((colIndex) => row[colIndex]),
         );
+        // Add the total number of plt
+        body.push([
+          "",
+          "",
+          { content: group.totalPlt, styles: { fontStyle: "bold" } },
+        ]);
         if (group.notes) {
           body.push([
             {
@@ -167,6 +176,12 @@ function App() {
       const body = group.rows.map((row) =>
         columnIndices.map((colIndex) => row[colIndex]),
       );
+      // Add the total number of plt
+      body.push([
+        "",
+        "",
+        { content: group.totalPlt, styles: { fontStyle: "bold" } },
+      ]);
       if (group.notes) {
         body.push([
           {
@@ -253,6 +268,11 @@ function App() {
                       )}
                     </tr>
                   ))}
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td className="total">{group.totalPlt}</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
