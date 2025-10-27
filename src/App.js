@@ -185,7 +185,7 @@ function App() {
     }
 
     const summaryPdfBlob = summaryDoc.output("blob");
-    zip.file(`all_entries_${formattedDate}.pdf`, summaryPdfBlob);
+    zip.file(`riepilogo_${formattedDate}.pdf`, summaryPdfBlob);
 
     const zipBlob = await zip.generateAsync({ type: "blob" });
     const link = document.createElement("a");
