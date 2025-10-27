@@ -5,12 +5,41 @@ import autoTable from "jspdf-autotable";
 import JSZip from "jszip";
 import "./App.css";
 
+function getFormattedDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString + "T00:00:00");
+  return new Intl.DateTimeFormat("it-IT", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
 function App() {
-  const [sheetData, setSheetData] = useState({ idIndex: null, groups: [] });
   // Spreadsheet configuration
   const idIndex = 6;
   const columnIndices = [18, 23, 26];
   const columnHeaders = ["Destinazione", "Codice prodotto", "Quantità"];
+
+  // Date configuration
+  const today = new Date();
+  const formattedDate = getFormattedDate(today);
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const [sheetData, setSheetData] = useState({ idIndex: null, groups: [] });
+  const [selectedDate, setSelectedDate] = useState(getFormattedDate(tomorrow));
+
+  const handleDateChange = (event) => {
+    setSelectedDate(event.target.value);
+  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -84,12 +113,6 @@ function App() {
       acc[driver].push(group);
       return acc;
     }, {});
-
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    const formattedDate = `${year}-${month}-${day}`;
 
     const zip = new JSZip();
 
@@ -173,11 +196,19 @@ function App() {
         <h1>Gestione Gite</h1>
         <div className="controls">
           <input type="file" onChange={handleFileUpload} />
+          <input
+            type="date"
+            id="date-input"
+            value={selectedDate}
+            onChange={handleDateChange}
+          />
           <button onClick={handleExportToPdf}>Genera PDF</button>
         </div>
       </header>
       <div className="total-groups">
-        <h3>Totale gite: {sheetData.groups.length}</h3>
+        <h3>
+          Totale gite del {formatDate(selectedDate)}: {sheetData.groups.length}
+        </h3>
       </div>
       <>
         <div className="table-container">
