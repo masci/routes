@@ -109,26 +109,18 @@ function App() {
       return;
     }
 
-    const groupsByDriver = sheetData.groups.reduce((acc, group) => {
-      const driver = group.driverName;
-      if (!acc[driver]) {
-        acc[driver] = [];
-      }
-      acc[driver].push(group);
-      return acc;
-    }, {});
-
     const zip = new JSZip();
     const exportContainer = document.getElementById("export-container");
+    const driverGitaCounter = {};
 
-    for (const driver in groupsByDriver) {
-      const driverGroups = groupsByDriver[driver];
-      const driverContainer = document.createElement("div");
-      driverContainer.className = "group-container";
+    for (const group of sheetData.groups) {
+      const driver = group.driverName;
+      const gitaIndex = (driverGitaCounter[driver] || 0) + 1;
+      driverGitaCounter[driver] = gitaIndex;
 
-      driverGroups.forEach((group) => {
-        const groupEl = document.createElement("div");
-        groupEl.innerHTML = `
+      const gitaContainer = document.createElement("div");
+      gitaContainer.className = "group-container";
+      gitaContainer.innerHTML = `
           <h2>Gita: ${group.id}  Autista: ${driver}</h2>
           <table class="table">
             <thead>
@@ -161,16 +153,14 @@ function App() {
             </tbody>
           </table>
         `;
-        driverContainer.appendChild(groupEl);
-      });
 
-      exportContainer.appendChild(driverContainer);
-      const canvas = await html2canvas(driverContainer);
+      exportContainer.appendChild(gitaContainer);
+      const canvas = await html2canvas(gitaContainer);
       const jpegBlob = await new Promise((resolve) =>
         canvas.toBlob(resolve, "image/jpeg"),
       );
-      zip.file(`${formattedDate}_${driver}.jpeg`, jpegBlob);
-      exportContainer.removeChild(driverContainer);
+      zip.file(`${formattedDate}_${driver}_${gitaIndex}.jpeg`, jpegBlob);
+      exportContainer.removeChild(gitaContainer);
     }
 
     // Generate a summary PDF with all entries
