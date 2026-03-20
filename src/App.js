@@ -74,7 +74,7 @@ function App() {
           groupedData.push(currentGroup);
         }
 
-        currentGroup.totalPlt += parseInt(row[totalPltIndex]) || 0;
+        currentGroup.totalPlt += parseFloat(row[totalPltIndex]) || 0;
         currentGroup.rows.push(row);
       }
 
